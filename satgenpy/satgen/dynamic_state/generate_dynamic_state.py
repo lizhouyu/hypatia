@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import json
 from satgen.distance_tools import *
 from astropy import units as u
 import math
@@ -188,8 +189,14 @@ def generate_dynamic_state_at(
         print("\nGSL IN-RANGE INFORMATION")
 
     # What satellites can a ground station see
-    ground_station_satellites_in_range = []
+    ground_station_satellites_in_range = {} # dict with {gid: {info: {name: name, lat: lat, longi: longi, elevation: elevation_m_float, ...}, sat_list: [{'sid': sid, 'distance_m': distance_m}]}
+    satellite_ground_stations_in_range = {} # dict with {sid: 'gs_list': [{'gid': gid, 'info': info, distance_m: distance_m}]}
+    for sid in range(len(satellites)):
+        satellite_ground_stations_in_range[sid] = {'gs_list': []}
     for ground_station in ground_stations:
+        # get ground station information
+        gid = ground_station['gid']
+        ground_station_satellites_in_range[gid] = {'info': ground_station, 'sat_list': []}
         # Find satellites in range
         satellites_in_range = []
         for sid in range(len(satellites)):
@@ -204,84 +211,41 @@ def generate_dynamic_state_at(
                 sat_net_graph_all_with_only_gsls.add_edge(
                     sid, len(satellites) + ground_station["gid"], weight=distance_m
                 )
+                sat_in_range_info = {
+                    'sid': sid,
+                    'distance_m': distance_m
+                }
+                gs_in_range_info = {
+                    'gid': gid,
+                    'info': ground_station,
+                    'distance_m': distance_m
+                }
+                ground_station_satellites_in_range[gid]['sat_list'].append(sat_in_range_info)
+                satellite_ground_stations_in_range[sid]['gs_list'].append(gs_in_range_info)
 
-        ground_station_satellites_in_range.append(satellites_in_range)
+    # # Print how many are in range
+    # ground_station_num_in_range = list(map(lambda x: len(x), ground_station_satellites_in_range))
+    # if enable_verbose_logs:
+    #     print("  > Min. satellites in range... " + str(np.min(ground_station_num_in_range)))
+    #     print("  > Max. satellites in range... " + str(np.max(ground_station_num_in_range)))
 
-    # Print how many are in range
-    ground_station_num_in_range = list(map(lambda x: len(x), ground_station_satellites_in_range))
-    if enable_verbose_logs:
-        print("  > Min. satellites in range... " + str(np.min(ground_station_num_in_range)))
-        print("  > Max. satellites in range... " + str(np.max(ground_station_num_in_range)))
+    # record satellite positions
+    sat_info = {} # {sat_idx: {long: sat.sublong, lat: sat.sublat}} 
+    for sat_idx in range(len(satellites)):
+        sat = satellites[sat_idx]
+        sat.compute(str(time))
+        sat_info[sat_idx] = {
+            'latitude_degrees': math.degrees(sat.sublat),
+            'longitude_degrees': math.degrees(sat.sublong)
+        }
 
-    #################################
+    # record current ground-satellite connection state
 
-    #
-    # Call the dynamic state algorithm which:
-    #
-    # (a) Output the gsl_if_bandwidth_<t>.txt files
-    # (b) Output the fstate_<t>.txt files
-    #
-    if dynamic_state_algorithm == "algorithm_free_one_only_over_isls":
+    output_filename = output_dynamic_state_dir + "/constellation_info_" + str(time_since_epoch_ns) + ".json"
 
-        return algorithm_free_one_only_over_isls(
-            output_dynamic_state_dir,
-            time_since_epoch_ns,
-            satellites,
-            ground_stations,
-            sat_net_graph_only_satellites_with_isls,
-            ground_station_satellites_in_range,
-            num_isls_per_sat,
-            sat_neighbor_to_if,
-            list_gsl_interfaces_info,
-            prev_output,
-            enable_verbose_logs
-        )
-
-    elif dynamic_state_algorithm == "algorithm_free_gs_one_sat_many_only_over_isls":
-
-        return algorithm_free_gs_one_sat_many_only_over_isls(
-            output_dynamic_state_dir,
-            time_since_epoch_ns,
-            satellites,
-            ground_stations,
-            sat_net_graph_only_satellites_with_isls,
-            ground_station_satellites_in_range,
-            num_isls_per_sat,
-            sat_neighbor_to_if,
-            list_gsl_interfaces_info,
-            prev_output,
-            enable_verbose_logs
-        )
-
-    elif dynamic_state_algorithm == "algorithm_free_one_only_gs_relays":
-
-        return algorithm_free_one_only_gs_relays(
-            output_dynamic_state_dir,
-            time_since_epoch_ns,
-            satellites,
-            ground_stations,
-            sat_net_graph_all_with_only_gsls,
-            num_isls_per_sat,
-            list_gsl_interfaces_info,
-            prev_output,
-            enable_verbose_logs
-        )
-
-    elif dynamic_state_algorithm == "algorithm_paired_many_only_over_isls":
-
-        return algorithm_paired_many_only_over_isls(
-            output_dynamic_state_dir,
-            time_since_epoch_ns,
-            satellites,
-            ground_stations,
-            sat_net_graph_only_satellites_with_isls,
-            ground_station_satellites_in_range,
-            num_isls_per_sat,
-            sat_neighbor_to_if,
-            list_gsl_interfaces_info,
-            prev_output,
-            enable_verbose_logs
-        )
-
-    else:
-        raise ValueError("Unknown dynamic state algorithm: " + str(dynamic_state_algorithm))
+    with open(output_filename, 'w') as dump_f:
+        json.dump({
+            'gs_connection':  ground_station_satellites_in_range,
+            'sg_connection': satellite_ground_stations_in_range,
+            'sat_info': sat_info
+        }, dump_f, indent=4)

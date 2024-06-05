@@ -88,22 +88,83 @@ class MainHelper:
                 "input_data/ground_stations_paris_moscow_grid.basic.txt",
                 output_generated_data_dir + "/" + name + "/ground_stations.txt"
             )
+        elif gs_selection == "ground_stations_first_10":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_10.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            )            
+        elif gs_selection == "ground_stations_first_20":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_20.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            ) 
+        elif gs_selection == "ground_stations_first_30":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_30.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            )
+        elif gs_selection == "ground_stations_first_40":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_40.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            )
+        elif gs_selection == "ground_stations_first_50":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_50.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            )
+        elif gs_selection == "ground_stations_first_60":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_60.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            )
+        elif gs_selection == "ground_stations_first_70":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_70.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            )
+        elif gs_selection == "ground_stations_first_80":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_80.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            )
+        elif gs_selection == "ground_stations_first_90":
+            satgen.extend_ground_stations(
+                "input_data/ground_stations_first_90.txt",
+                output_generated_data_dir + "/" + name + "/ground_stations.txt"
+            )
         else:
             raise ValueError("Unknown ground station selection: " + gs_selection)
 
         # TLEs
         print("Generating TLEs...")
-        satgen.generate_tles_from_scratch_manual(
-            output_generated_data_dir + "/" + name + "/tles.txt",
-            self.NICE_NAME,
-            self.NUM_ORBS,
-            self.NUM_SATS_PER_ORB,
-            self.PHASE_DIFF,
-            self.INCLINATION_DEGREE,
-            self.ECCENTRICITY,
-            self.ARG_OF_PERIGEE_DEGREE,
-            self.MEAN_MOTION_REV_PER_DAY
-        )
+        if self.BASE_NAME == "sentinel2":
+            # write sentinel2 tles
+            sentinel2_tles = [
+                "1 2",
+                "Sentine2A",
+                "1 40697U 15028A   24157.56421670  .00000260  00000-0  11586-3 0  9994",
+                "2 40697  98.5687 231.9990 0001177  97.4275 262.7041 14.30812918467673",
+                "Sentinel2B",
+                "1 42063U 17013A   24157.52921708  .00000264  00000-0  11736-3 0  9993",
+                "2 42063  98.5693 231.9585 0001189  93.7344 266.3975 14.30813256378581"
+            ]
+            with open(output_generated_data_dir + "/" + name + "/tles.txt", 'w') as f:
+                for line in sentinel2_tles:
+                    f.writelines(line)
+                    f.write('\n')
+        else:
+            satgen.generate_tles_from_scratch_manual(
+                output_generated_data_dir + "/" + name + "/tles.txt",
+                self.NICE_NAME,
+                self.NUM_ORBS,
+                self.NUM_SATS_PER_ORB,
+                self.PHASE_DIFF,
+                self.INCLINATION_DEGREE,
+                self.ECCENTRICITY,
+                self.ARG_OF_PERIGEE_DEGREE,
+                self.MEAN_MOTION_REV_PER_DAY
+            )
 
         # ISLs
         print("Generating ISLs...")
