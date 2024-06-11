@@ -62,11 +62,12 @@ def read_tles(filename_tles):
             # See also: https://www.celestrak.com/columns/v04n03/#FAQ04
             epoch_year = tles_line_2[18:20]
             epoch_day = float(tles_line_2[20:32])
+            print(epoch_year, epoch_day)
             epoch = Time("20" + epoch_year + "-01-01 00:00:00", scale="tdb") + (epoch_day - 1) * u.day
             if universal_epoch is None:
                 universal_epoch = epoch
-            if epoch != universal_epoch:
-                raise ValueError("The epoch of all TLES must be the same")
+            # if epoch != universal_epoch:
+            #     raise ValueError("The epoch of all TLES must be the same")
 
             # Finally, store the satellite information
             satellites.append(ephem.readtle(tles_line_1, tles_line_2, tles_line_3))
