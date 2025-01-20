@@ -1,7 +1,7 @@
 # python main_sentinel2.py 86400 1000 isls_none ground_stations_first_10 algorithm_free_one_only_gs_relays 8
 # python main_sentinel2.py 3600 1000 isls_none ground_stations_top_100 algorithm_free_one_only_gs_relays 4
 # python main_sentinel2.py 432000 1000 isls_none ground_stations_first_10 algorithm_free_one_only_gs_relays 8
-python main_sentinel2.py 864000 1000 isls_none ground_stations_first_10 algorithm_free_one_only_gs_relays 8
+python main_sentinel2.py 864000 30000 isls_none ground_stations_first_10 algorithm_free_one_only_gs_relays 8
 python main_sentinel2.py 864000 1000 isls_none ground_stations_first_20 algorithm_free_one_only_gs_relays 8
 python main_sentinel2.py 864000 1000 isls_none ground_stations_first_30 algorithm_free_one_only_gs_relays 8
 python main_sentinel2.py 864000 1000 isls_none ground_stations_first_40 algorithm_free_one_only_gs_relays 8
@@ -10,3 +10,5 @@ python main_sentinel2.py 864000 1000 isls_none ground_stations_first_60 algorith
 python main_sentinel2.py 864000 1000 isls_none ground_stations_first_70 algorithm_free_one_only_gs_relays 8
 python main_sentinel2.py 864000 1000 isls_none ground_stations_first_80 algorithm_free_one_only_gs_relays 8
 python main_sentinel2.py 864000 1000 isls_none ground_stations_first_90 algorithm_free_one_only_gs_relays 8
+python main_sentinel2.py 86400 30000 isls_none ground_stations_top_100 algorithm_free_one_only_gs_relays 8
+python main_sentinel2.py 86400 30000 isls_none ground_stations_first_10 algorithm_free_one_only_gs_relays 8

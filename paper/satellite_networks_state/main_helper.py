@@ -24,6 +24,7 @@ import sys
 sys.path.append("../../satgenpy")
 import satgen
 import os
+import shutil
 
 
 class MainHelper:
@@ -139,20 +140,14 @@ class MainHelper:
         # TLEs
         print("Generating TLEs...")
         if self.BASE_NAME == "sentinel2":
-            # write sentinel2 tles
-            sentinel2_tles = [
-                "1 2",
-                "Sentinel2A 0",
-                "1 40697U 15028A   24157.56421670  .00000260  00000+0  11586-3 0  9993",
-                "2 40697  98.5687 231.9990 0001177  97.4275 262.7041 14.30812918467673",
-                "Sentinel2B 1",
-                "1 42063U 17013A   24157.52921708  .00000264  00000+0  11736-3 0  9992",
-                "2 42063  98.5693 231.9585 0001189  93.7344 266.3975 14.30813256378581"
-            ]
-            with open(output_generated_data_dir + "/" + name + "/tles.txt", 'w') as f:
-                for line in sentinel2_tles:
-                    f.writelines(line)
-                    f.write('\n')
+            # copy sentinel2 tles to output directory
+            shutil.copy("input_data/sentinel2_tles.txt", output_generated_data_dir + "/" + name + "/tles.txt")
+        elif self.BASE_NAME == "dove2":
+            # copy dove2 tles to output directory
+            shutil.copy("input_data/dove2_tles.txt", output_generated_data_dir + "/" + name + "/tles.txt")
+        elif self.BASE_NAME == "landsat8":
+            # copy landsat8 tles to output directory
+            shutil.copy("input_data/landsat8_tles.txt", output_generated_data_dir + "/" + name + "/tles.txt")
         else:
             satgen.generate_tles_from_scratch_manual(
                 output_generated_data_dir + "/" + name + "/tles.txt",
